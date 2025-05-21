@@ -20,8 +20,18 @@ namespace Excercise1
         {
             base.OnEnable();
             //TODO: Get the reference to the player.
-            if (_player == null)
-                Debug.LogError($"{_logTag} Player not found!");
+            //verifica la existencia de la instancia unica de characterservice
+            if (CharacterService.Instance != null)
+            {
+                if (!CharacterService.Instance.TryGetCharacter(playerId, out _player))
+                {
+                    Debug.LogError($"{_logTag} Player not found!");
+                }
+            }
+            else
+            {
+                Debug.LogError($"{_logTag} CharacterService instance is null!");
+            }
         }
 
         private void Update()
