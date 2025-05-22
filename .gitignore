@@ -73,3 +73,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+Assets/2_Gameplay/Scripts/GroundedState.cs.meta
+Assets/2_Gameplay/Scripts/IPlayerState.cs.meta
+Assets/2_Gameplay/Scripts/JumpingState.cs.meta
+Assets/2_Gameplay/Scripts/DoubleJumpState.cs.meta
+Assets/2_Gameplay/Scripts/FallState.cs.meta
+Assets/2_Gameplay/Scripts/StateMachine.cs.meta

@@ -10,13 +10,29 @@ namespace Gameplay
         [SerializeField] private InputActionReference jumpInput;
         [SerializeField] private float airborneSpeedMultiplier = .5f;
         //TODO: This booleans are not flexible enough. If we want to have a third jump or other things, it will become a hazzle.
-        private bool _isJumping;
-        private bool _isDoubleJumping;
+        //private bool _isJumping;
+        //private bool _isDoubleJumping;
         private Character _character;
         private Coroutine _jumpCoroutine;
+        private StateMachine _stateMachine;
+        private bool _jumpRequested;
+        public Character Character => _character;
+        public float AirborneSpeedMultiplier => airborneSpeedMultiplier;
+        public bool JumpRequested { get; private set; }
+        public void RequestJump() => JumpRequested = true;
+        public void ConsumeJump() => JumpRequested = false;
 
         private void Awake()
-            => _character = GetComponent<Character>();
+        {
+            _character = GetComponent<Character>();
+            _stateMachine = new StateMachine(this);
+            _stateMachine.Initialize(new GroundedState());
+        }
+
+        private void Update()
+        {
+            _stateMachine.Update();
+        }
 
         private void OnEnable()
         {
@@ -29,10 +45,13 @@ namespace Gameplay
             if (jumpInput?.action != null)
                 jumpInput.action.performed += HandleJumpInput;
         }
+
         private void OnDisable()
         {
             if (moveInput?.action != null)
             {
+                //added started -= HandleMoveInput i dont know if its neccessary
+                moveInput.action.started -= HandleMoveInput;
                 moveInput.action.performed -= HandleMoveInput;
                 moveInput.action.canceled -= HandleMoveInput;
             }
@@ -41,45 +60,27 @@ namespace Gameplay
         }
 
         private void HandleMoveInput(InputAction.CallbackContext ctx)
-        {
-            var direction = ctx.ReadValue<Vector2>().ToHorizontalPlane();
-            if (_isJumping || _isDoubleJumping)
-                direction *= airborneSpeedMultiplier;
-            _character?.SetDirection(direction);
-        }
+            => _stateMachine.HandleMove(ctx);
 
         private void HandleJumpInput(InputAction.CallbackContext ctx)
-        {
-            //TODO: This function is barely readable. We need to refactor how we control the jumping
-            if (_isJumping)
-            {
-                if (_isDoubleJumping)
-                    return;
-                RunJumpCoroutine();
-                _isDoubleJumping = true;
-                return;
-            }
-            RunJumpCoroutine();
-            _isJumping = true;
-        }
+            => _stateMachine.HandleJump(ctx);
 
-        private void RunJumpCoroutine()
+        public void RunJumpCoroutine()
         {
             if (_jumpCoroutine != null)
                 StopCoroutine(_jumpCoroutine);
             _jumpCoroutine = StartCoroutine(_character.Jump());
         }
 
-        private void OnCollisionEnter(Collision other)
+        private void OnCollisionEnter(Collision collision)
+            => _stateMachine.OnCollisionEnter(collision);
+
+        public void RequestGrounded()
+            => _stateMachine.TransitionTo(new GroundedState());
+
+        public void NotifyLanding()
         {
-            foreach (var contact in other.contacts)
-            {
-                if (Vector3.Angle(contact.normal, Vector3.up) < 5)
-                {
-                    _isJumping = false;
-                    _isDoubleJumping = false;
-                }
-            }
+            _stateMachine.OnLanding();
         }
     }
 }

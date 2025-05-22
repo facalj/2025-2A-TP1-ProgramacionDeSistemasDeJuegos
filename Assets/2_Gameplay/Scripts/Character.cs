@@ -30,5 +30,12 @@ namespace Gameplay
             yield return new WaitForFixedUpdate();
             _rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
+
+        //method to get the character velocity
+        public Vector3 GetVelocity()
+        {
+            return _rigidbody.linearVelocity;
+        }
+
     }
 }
