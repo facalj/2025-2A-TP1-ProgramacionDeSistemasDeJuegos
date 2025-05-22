@@ -20,7 +20,7 @@ namespace Excercise1
         {
             base.OnEnable();
             //TODO: Get the reference to the player.
-            //verifica la existencia de la instancia unica de characterservice
+            //verify the existence of the characterservice instance
             if (CharacterService.Instance != null)
             {
                 if (!CharacterService.Instance.TryGetCharacter(playerId, out _player))

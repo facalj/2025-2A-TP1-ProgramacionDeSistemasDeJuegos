@@ -7,10 +7,10 @@ namespace Excercise1
     {
         private readonly Dictionary<string, ICharacter> _charactersById = new();
 
-        //instancia para poder usar el patron de diseño singleton
+        //instance to use the singleton design pattern
         public static CharacterService Instance { get; private set; }
 
-        //singelton al hacer Awake
+        //singelton at Awake
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -29,7 +29,7 @@ namespace Excercise1
         public bool TryRemoveCharacter(string id)
             => _charactersById.Remove(id);
 
-        //getcharacter para obtener al character deseado como salida y un bool de si se encuentra o no
+        //getcharacter to obtain the desire character as output, and bool to determin if its founded
         public bool TryGetCharacter(string id, out ICharacter character)
             => _charactersById.TryGetValue(id, out character);
     }
